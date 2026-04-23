@@ -6,6 +6,7 @@ import api from '../api/axios';
 type Category = {
   id: number;
   name: string;
+  description?: string | null;
 };
 
 type Part = {
@@ -67,6 +68,16 @@ const emptyFieldForm: FieldForm = {
   isRequired: false
 };
 
+type CategoryForm = {
+  name: string;
+  description: string;
+};
+
+const emptyCategoryForm: CategoryForm = {
+  name: '',
+  description: ''
+};
+
 export const ManagerParts: React.FC = () => {
   const [parts, setParts] = useState<Part[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -79,6 +90,7 @@ export const ManagerParts: React.FC = () => {
   const [categoryFields, setCategoryFields] = useState<CategoryField[]>([]);
   const [partFields, setPartFields] = useState<CategoryField[]>([]);
   const [fieldForm, setFieldForm] = useState<FieldForm>(emptyFieldForm);
+  const [categoryForm, setCategoryForm] = useState<CategoryForm>(emptyCategoryForm);
 
   const loadData = async () => {
     try {
@@ -274,6 +286,41 @@ export const ManagerParts: React.FC = () => {
     }
   };
 
+  const saveCategory = async () => {
+    if (!categoryForm.name.trim()) {
+      toast.error('Вкажіть назву категорії');
+      return;
+    }
+
+    try {
+      const response = await api.post<Category>('/part-categories', {
+        name: categoryForm.name.trim(),
+        description: categoryForm.description.trim() || undefined
+      });
+
+      setCategories((current) => [...current, response.data]);
+      setCategoryForm(emptyCategoryForm);
+      toast.success('Категорію додано');
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || 'Не вдалося створити категорію');
+    }
+  };
+
+  const removeCategory = async (id: number) => {
+    if (!confirm('Видалити цю категорію?')) return;
+
+    try {
+      await api.delete(`/part-categories/${id}`);
+      setCategories((current) => current.filter((category) => category.id !== id));
+      if (categoryFilter === String(id)) {
+        setCategoryFilter('all');
+      }
+      toast.success('Категорію видалено');
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || 'Не вдалося видалити категорію');
+    }
+  };
+
   if (loading) {
     return <div className="p-8 text-center text-gray-600">Завантаження деталей...</div>;
   }
@@ -338,6 +385,53 @@ export const ManagerParts: React.FC = () => {
               </option>
             ))}
           </select>
+        </div>
+
+        <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <h3 className="text-sm font-semibold text-gray-800">Категорії деталей</h3>
+            <span className="text-xs text-gray-500">{categories.length} всього</span>
+          </div>
+
+          <div className="grid gap-3 md:grid-cols-3">
+            <input
+              value={categoryForm.name}
+              onChange={(event) =>
+                setCategoryForm((current) => ({ ...current, name: event.target.value }))
+              }
+              placeholder="Нова категорія"
+              className="rounded-xl border border-gray-300 px-4 py-2.5"
+            />
+            <input
+              value={categoryForm.description}
+              onChange={(event) =>
+                setCategoryForm((current) => ({ ...current, description: event.target.value }))
+              }
+              placeholder="Опис (необов'язково)"
+              className="rounded-xl border border-gray-300 px-4 py-2.5"
+            />
+            <button
+              onClick={saveCategory}
+              className="rounded-xl bg-blue-600 px-4 py-2.5 text-white hover:bg-blue-700"
+            >
+              Створити категорію
+            </button>
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-2">
+            {categories.map((category) => (
+              <div key={category.id} className="inline-flex items-center gap-2 rounded-full border border-gray-300 bg-white px-3 py-1.5 text-sm">
+                <span>{category.name}</span>
+                <button
+                  onClick={() => removeCategory(category.id)}
+                  className="rounded-full border border-red-300 p-1 text-red-600 hover:bg-red-50"
+                  title="Видалити категорію"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
