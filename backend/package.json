@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "tsx src/server.ts",
+    "build": "tsc -p tsconfig.json",
     "generate": "prisma generate",
     "import:external": "tsx src/tools/external-data-import/index.ts",
     "postinstall": "prisma generate",
