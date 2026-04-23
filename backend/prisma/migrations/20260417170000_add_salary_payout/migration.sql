@@ -1,0 +1,3 @@
+-- No-op migration placeholder.
+-- This migration folder existed without a migration.sql file, which breaks prisma migrate deploy.
+-- Keeping it as an explicit empty migration preserves migration history without changing schema.
