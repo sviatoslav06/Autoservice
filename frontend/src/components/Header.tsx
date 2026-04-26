@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
   BarChart3,
@@ -28,8 +28,25 @@ type NavItem = {
 export const Header: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [showMobileMenu, setShowMobileMenu] = React.useState(false);
   const [showDropdown, setShowDropdown] = React.useState(false);
+  const dropdownRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+
+    if (showDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+  }, [showDropdown]);
 
   const handleLogout = () => {
     setShowDropdown(false);
@@ -91,14 +108,22 @@ export const Header: React.FC = () => {
           </Link>
 
           <nav className="hidden lg:flex items-center gap-6 text-sm font-medium text-muted-foreground">
-            {navItems.map((item) => (
-              <Link key={item.path} to={item.path} className="transition-colors hover:text-foreground">
-                {item.label}
-              </Link>
-            ))}
-            <Link to="/profile" className="transition-colors hover:text-foreground">
-              Профіль
-            </Link>
+            {navItems.map((item) => {
+              const isActive = location.pathname === item.path;
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`transition-colors ${
+                    isActive 
+                      ? 'text-foreground font-semibold border-b-2 border-blue-600 pb-1' 
+                      : 'hover:text-foreground'
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
           </nav>
 
           <div className="hidden md:flex items-center gap-3">
@@ -106,7 +131,7 @@ export const Header: React.FC = () => {
               <p className="text-sm font-semibold text-foreground leading-tight">{user.username}</p>
               <p className="text-xs text-muted-foreground">{user.role}</p>
             </div>
-            <div className="relative">
+            <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setShowDropdown((prev) => !prev)}
                 className="w-10 h-10 rounded-xl bg-muted text-foreground flex items-center justify-center font-semibold hover:bg-accent transition-colors"
@@ -150,26 +175,23 @@ export const Header: React.FC = () => {
           <nav className="md:hidden py-3 border-t border-gray-200 space-y-1">
             {navItems.map((item) => {
               const Icon = item.icon;
+              const isActive = location.pathname === item.path;
               return (
                 <Link
                   key={item.path}
                   to={item.path}
                   onClick={() => setShowMobileMenu(false)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100"
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg ${
+                    isActive
+                      ? 'bg-blue-100 text-blue-600 font-semibold'
+                      : 'text-gray-700 hover:bg-gray-100'
+                  }`}
                 >
                   <Icon className="w-4 h-4" />
                   <span>{item.label}</span>
                 </Link>
               );
             })}
-            <Link
-              to="/profile"
-              onClick={() => setShowMobileMenu(false)}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100"
-            >
-              <User className="w-4 h-4" />
-              <span>Профіль</span>
-            </Link>
             <button
               onClick={handleLogout}
               className="flex items-center gap-2 px-3 py-2 rounded-lg text-red-600 hover:bg-red-50 w-full text-left"

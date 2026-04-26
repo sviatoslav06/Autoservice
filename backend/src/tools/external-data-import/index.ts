@@ -530,7 +530,20 @@ async function ensureDemoMechanics(): Promise<ImportedMechanic[]> {
   return mechanics;
 }
 
-async function importVehicleCatalog(clientIds: number[]) {
+async function importVehicleCatalog() {
+  // Get all clients from the database
+  const allClients = await prisma.client.findMany({
+    orderBy: { id: 'asc' }
+  });
+
+  const clientIds = allClients.map(c => c.id);
+
+  if (clientIds.length === 0) {
+    throw new Error('No clients found in database. Run ensureDemoClients first.');
+  }
+
+  console.log(`Distributing ${TARGET_VEHICLES} vehicles among ${clientIds.length} clients...`);
+
   const vehicles: Array<{
     clientId: number;
     make: string;
@@ -1109,12 +1122,12 @@ async function recalculateImportedOrderTotal(tx: Prisma.TransactionClient, order
 
 async function main(): Promise<ExternalImportReport> {
   console.log('Preparing demo clients and boxes...');
-  const clientIds = await ensureDemoClients();
+  await ensureDemoClients();
   await ensureBoxes();
   const mechanics = await ensureDemoMechanics();
 
   console.log('Importing vehicle catalog from NHTSA vPIC...');
-  const vehicleCount = await importVehicleCatalog(clientIds);
+  const vehicleCount = await importVehicleCatalog();
 
   console.log('Importing parts catalog from Wikipedia...');
   const partStats = await importPartCatalog();
