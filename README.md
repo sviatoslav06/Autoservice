@@ -1,19 +1,61 @@
 # AutoService — Auto Repair Shop Management System
 
-A full-stack web application for managing an auto repair shop: work orders, services, parts inventory, employees, and finances — all in one place.
+A full-stack web application for managing an auto repair shop end-to-end: work orders, service bays, parts inventory, employee workload, payments, and analytics — all behind a role-based access system.
 
 **Live Demo:** [autoservice-flax.vercel.app](https://autoservice-flax.vercel.app/)
 
 ---
 
-## Key Features
+## Screenshots
 
-- **Work Order Management** — create, assign, and track repair orders with real-time status updates
-- **Service Bays** — manage bay assignments and workload distribution across mechanics
-- **Parts & Inventory** — catalog of spare parts with categories, pricing, and stock tracking
-- **Employee Management** — staff profiles, rates, and work logs tied to individual orders
-- **Payments & Finance** — record payments and generate financial reports
-- **Role-Based Access** — five roles out of the box: Client, Manager, Mechanic, Accountant, Administrator
+> _Add 2–3 screenshots of the dashboard, order flow, and mechanic workplace here_
+
+---
+
+## Features
+
+### Role-Based Access (5 roles)
+
+| Role | Access |
+|---|---|
+| **Client** | Register vehicles, book services, track own orders |
+| **Manager** | Manage orders, service bays, parts catalog, services |
+| **Mechanic** | Personal workplace — view assigned work, log time |
+| **Accountant** | Finance module, payment records, analytics |
+| **Admin** | Full access including user management and data import |
+
+### Core Modules
+
+**Orders & Bays**
+- Create orders linked to a client, vehicle, and specific service bay
+- Order lifecycle: `Planned → In Progress → Ready for Delivery → Completed / Canceled`
+- Assign multiple services and parts to a single order
+- Track actual vs. estimated duration per service
+
+**Parts & Inventory**
+- Parts catalog with categories and stock quantities
+- Custom fields per category (text, number, date, boolean) — flexible enough for any part type
+- Supplier tracking and per-part pricing
+- Parts consumed per order with quantity and unit price recorded
+
+**Services**
+- Service catalog with standard price and estimated duration
+- Each service on an order is assigned to a specific mechanic with actual duration and cost logged
+
+**Vehicles**
+- Clients register their vehicles: make, model, year, VIN, license plate, kilometrage
+- Full order history per vehicle
+
+**Payments & Finance**
+- Payments linked to orders: cash, card, or bank transfer
+- Payment status tracking (pending / completed)
+- Finance overview for accountants
+
+**Analytics**
+- Analytics dashboard accessible to Admins and Accountants
+
+**Data Import**
+- Admin-only module for importing external data into the system
 
 ---
 
@@ -21,91 +63,49 @@ A full-stack web application for managing an auto repair shop: work orders, serv
 
 | Layer | Technologies |
 |---|---|
-| Backend | Node.js, Express, TypeScript, Prisma ORM |
-| Frontend | React, Vite, TypeScript, Tailwind CSS |
-| Database | PostgreSQL (via Prisma) |
-| Auth | JWT |
+| **Backend** | Node.js, Express, TypeScript |
+| **ORM** | Prisma (PostgreSQL) |
+| **Frontend** | React, React Router v6, TypeScript, Vite, Tailwind CSS |
+| **Auth** | JWT (access token, role-based route guards) |
+| **Security** | Helmet, CORS |
+| **Logging** | Morgan |
 
 ---
 
-## Infrastructure (already deployed)
+## API Modules
 
-| Service | Provider | URL |
-|---|---|---|
-| Frontend | Vercel | https://autoservice-flax.vercel.app/ |
-| Backend API | Render | https://autoservice-2h6l.onrender.com |
-| Database | Neon (serverless Postgres) | https://console.neon.tech/app/projects/mute-math-20499422 |
+The backend exposes a RESTful API at `/api/`:
 
-Everything is live and running — no setup required to evaluate the product.
-
----
-
-## Local Development
-
-**Requirements:** Node.js 18+, npm or yarn, PostgreSQL
-
-### 1. Clone the repository
-
-```bash
-git clone <repo-url>
-cd autoservice-project
-```
-
-### 2. Set up the backend
-
-```bash
-cd backend
-npm install
-npm run generate        # Generate Prisma Client
-npx prisma migrate dev  # Run database migrations
-npx prisma db seed      # (Optional) Seed initial data
-npm run dev             # Start development server
-```
-
-### 3. Set up the frontend
-
-```bash
-cd ../frontend
-npm install
-npm run dev
-```
-
-The frontend runs at `http://localhost:5173` and the backend at `http://localhost:5001` (or as configured in `.env`).
-
----
-
-## Environment Variables
-
-Create a `.env` file inside `backend/`:
-
-```env
-DATABASE_URL=postgresql://user:password@localhost:5432/autoservice_db
-PORT=5001
-JWT_SECRET=your_jwt_secret_here
-NODE_ENV=development
-```
-
----
-
-## Available Scripts
-
-**Backend** (`backend/`):
-
-| Script | Description |
+| Endpoint | Description |
 |---|---|
-| `npm run dev` | Start dev server with hot reload (tsx) |
-| `npm run build` | Compile TypeScript to `dist/` |
-| `npm run generate` | Regenerate Prisma Client after schema changes |
-| `npm start` | Run compiled production build |
-| `npm run import:external` | Import data from external sources |
+| `/api/auth` | Login, registration, JWT |
+| `/api/users` | User management |
+| `/api/workers` | Worker profiles and rates |
+| `/api/vehicles` | Client vehicles |
+| `/api/boxes` | Service bays |
+| `/api/services` | Service catalog |
+| `/api/parts` | Parts catalog |
+| `/api/part-categories` | Part categories |
+| `/api/part-fields` | Custom fields per category |
+| `/api/orders` | Orders (full CRUD + status management) |
+| `/api/payments` | Payments per order |
+| `/api/analytics` | Aggregated financial/operational stats |
+| `/api/data-import` | Bulk data import (Admin only) |
 
-**Frontend** (`frontend/`):
+---
 
-| Script | Description |
-|---|---|
-| `npm run dev` | Start Vite dev server |
-| `npm run build` | Production build |
-| `npm run preview` | Preview production build locally |
+## Database Schema (key relationships)
+
+```
+User ──< Client ──< Vehicle
+                 └──< Order >──< OrderService >── Service
+                            >──< OrderPart    >── Part ──< PartCategory
+                            └──< Payment
+User ──< Worker ──< OrderService
+Box ──────────────< Order
+```
+
+Full schema and migrations live in `backend/prisma/`.
 
 ---
 
@@ -114,34 +114,113 @@ NODE_ENV=development
 ```
 autoservice-project/
 ├── backend/
-│   ├── prisma/          # Schema & migrations
+│   ├── prisma/               # Schema, migrations, seed
 │   └── src/
-│       ├── routes/      # Express API routes
-│       ├── controllers/ # Business logic
-│       └── tools/       # Utility scripts (e.g. data import)
+│       ├── modules/          # Feature modules (auth, order, payment, analytics, …)
+│       ├── middleware/        # Error handling, auth guard
+│       └── config/           # Env config
 └── frontend/
     └── src/
-        ├── api/         # Axios client & API calls
-        ├── components/  # Reusable UI components
-        └── pages/       # Route-level page components
+        ├── pages/             # Route-level pages (Dashboard, BookingFlow, MechanicWorkplace, …)
+        ├── context/           # AuthContext (JWT + role state)
+        └── api/               # Axios client
 ```
 
 ---
 
-## Deployment
+## Deployed Infrastructure
 
-The project is already deployed across three managed services:
+| Service | Provider | URL |
+|---|---|---|
+| Frontend | Vercel | https://autoservice-flax.vercel.app |
+| Backend API | Render | https://autoservice-2h6l.onrender.com |
+| Database | Neon (serverless Postgres) | — |
 
-- **Vercel** (frontend) — set `VITE_API_URL=https://autoservice-2h6l.onrender.com/api` in project settings
-- **Render** (backend) — set `DATABASE_URL`, `JWT_SECRET`, `NODE_ENV=production`
-- **Neon** (database) — serverless Postgres, configure access permissions for the Render IP
+Everything is live — no setup required to evaluate the product.
+
+---
+
+## Local Development
+
+**Requirements:** Node.js 18+, PostgreSQL
+
+### 1. Clone
+
+```bash
+git clone https://github.com/sviatoslav06/Autoservice.git
+cd Autoservice
+```
+
+### 2. Backend
+
+```bash
+cd backend
+npm install
+cp .env.example .env        # fill in DATABASE_URL and JWT_SECRET
+npm run generate            # generate Prisma Client
+npx prisma migrate dev      # run migrations
+npx prisma db seed          # optional: seed demo data
+npm run dev
+```
+
+### 3. Frontend
+
+```bash
+cd ../frontend
+npm install
+npm run dev
+```
+
+Frontend runs at `http://localhost:5173`, backend at `http://localhost:5001`.
+
+---
+
+## Environment Variables
+
+`backend/.env`:
+
+```env
+DATABASE_URL=postgresql://user:password@localhost:5432/autoservice_db
+PORT=5001
+JWT_SECRET=your_jwt_secret_here
+NODE_ENV=development
+```
+
+`frontend/.env`:
+
+```env
+VITE_API_URL=http://localhost:5001/api
+```
+
+---
+
+## Scripts
+
+**Backend:**
+
+| Command | Description |
+|---|---|
+| `npm run dev` | Dev server with hot reload |
+| `npm run build` | Compile TypeScript to `dist/` |
+| `npm run generate` | Regenerate Prisma Client |
+| `npm run import:external` | Run external data import tool |
+| `npm start` | Run compiled production build |
+
+**Frontend:**
+
+| Command | Description |
+|---|---|
+| `npm run dev` | Vite dev server |
+| `npm run build` | Production build |
+| `npm run preview` | Preview production build locally |
 
 ---
 
 ## Roadmap
 
-- [ ] Unit and end-to-end test coverage
-- [ ] CI/CD via GitHub Actions (lint, build, test)
-- [ ] Docker Compose setup for one-command local development
-- [ ] SMS / email notifications for order status updates
-- [ ] Customer-facing portal for order tracking
+- [ ] Unit and end-to-end tests
+- [ ] CI/CD via GitHub Actions
+- [ ] Docker Compose for one-command local setup
+- [ ] Email / SMS notifications on order status change
+- [ ] Customer-facing order tracking portal
+- [ ] PDF invoice generation per order
