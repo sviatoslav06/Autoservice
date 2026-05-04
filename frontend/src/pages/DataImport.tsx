@@ -60,7 +60,7 @@ export const DataImport: React.FC = () => {
             </h1>
             <p className="mt-3 text-lg text-gray-600">
               Імпортуються зовнішні каталоги автомобілів, деталей, послуг, боксів, механіків і
-              генерація замовлень. Це допомагає швидко наповнити систему живими даними для демонстрації.
+              генерація замовлень.
             </p>
           </div>
 
@@ -96,7 +96,7 @@ export const DataImport: React.FC = () => {
           <Database className="h-6 w-6 text-amber-600" />
           <h2 className="mt-4 text-lg font-semibold text-gray-900">Обсяг</h2>
           <p className="mt-2 text-sm text-gray-600">
-            Генерується не менше 1000 записів по зовнішніх таблицях, з дозволеним поєднанням джерел.
+            Генерується не менше 1000 записів по зовнішніх таблицях.
           </p>
         </div>
       </div>

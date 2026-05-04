@@ -18,11 +18,11 @@ export const Profile: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({ username: '', phone: '' });
-  const [passwordForm, setPasswordForm] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
-  });
+  // const [passwordForm, setPasswordForm] = useState({
+  //   currentPassword: '',
+  //   newPassword: '',
+  //   confirmPassword: ''
+  // });
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -71,27 +71,27 @@ export const Profile: React.FC = () => {
     }
   };
 
-  const handlePasswordChange = (event: React.FormEvent) => {
-    event.preventDefault();
+  // const handlePasswordChange = (event: React.FormEvent) => {
+  //   event.preventDefault();
 
-    if (!passwordForm.currentPassword || !passwordForm.newPassword || !passwordForm.confirmPassword) {
-      toast.error('Заповніть всі поля пароля');
-      return;
-    }
+  //   if (!passwordForm.currentPassword || !passwordForm.newPassword || !passwordForm.confirmPassword) {
+  //     toast.error('Заповніть всі поля пароля');
+  //     return;
+  //   }
 
-    if (passwordForm.newPassword.length < 6) {
-      toast.error('Новий пароль має містити мінімум 6 символів');
-      return;
-    }
+  //   if (passwordForm.newPassword.length < 6) {
+  //     toast.error('Новий пароль має містити мінімум 6 символів');
+  //     return;
+  //   }
 
-    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      toast.error('Підтвердження пароля не співпадає');
-      return;
-    }
+  //   if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+  //     toast.error('Підтвердження пароля не співпадає');
+  //     return;
+  //   }
 
-    toast.message('Зміна пароля буде доступна після додавання API-ендпоінта');
-    setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
-  };
+  //   toast.message('Зміна пароля буде доступна після додавання API-ендпоінта');
+  //   setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+  // };
 
   if (loading) {
     return <div className="p-8 text-center text-gray-600">Завантаження профілю...</div>;
@@ -194,7 +194,7 @@ export const Profile: React.FC = () => {
           </form>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        {/* <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <h3 className="text-lg font-bold text-gray-900 mb-4">Зміна пароля</h3>
           <form className="space-y-4" onSubmit={handlePasswordChange}>
             <div>
@@ -240,7 +240,7 @@ export const Profile: React.FC = () => {
               Змінити пароль
             </button>
           </form>
-        </div>
+        </div> */}
       </div>
     </div>
   );

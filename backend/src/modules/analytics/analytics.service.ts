@@ -32,6 +32,7 @@ const kievDateFormatter = new Intl.DateTimeFormat('en-CA', {
 });
 
 export class AnalyticsService {
+  // Витрати на оплату праці
   private calculateLaborCost(
     services: Array<{
       actualDurationMinutes: number | null;

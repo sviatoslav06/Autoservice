@@ -361,19 +361,9 @@ export const Finance: React.FC = () => {
               <p>Часткових оплат: {financeSummary.partiallyPaid}</p>
             </div>
           </div>
-          <div className="rounded-3xl border border-gray-200 bg-white p-6">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">Підказка</h3>
-            <p className="text-sm text-gray-600">
-              Сторінка працює з реальними даними через `GET /api/payments/finance/orders`, `GET /api/payments/stats`
-              та `POST /api/payments/orders/:orderId/pay`.
-            </p>
-          </div>
 
           <div className="md:col-span-2 rounded-3xl border border-gray-200 bg-white p-6">
             <h3 className="text-lg font-bold text-gray-900 mb-4">Штучна виплата зарплатні механікам</h3>
-            <p className="mb-4 text-sm text-gray-600">
-              Це локальний облік без змін у базі даних. Сума виплати зберігається у браузері адміністратора / бухгалтера.
-            </p>
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {mechanics.map((mechanic) => {
                 const monthlyEstimate = Number(mechanic.hourlyRate) * 160;

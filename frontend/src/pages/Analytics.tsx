@@ -311,7 +311,7 @@ export const Analytics: React.FC = () => {
           </div>
           <h1 className="text-4xl font-bold tracking-tight text-gray-900">Аналітика автосервісу</h1>
           <p className="mt-2 text-lg text-gray-600">
-            Дохід, кількість замовлень, попит на послуги та деталізація по запасах у зрозумілому вигляді.
+            Дохід, кількість замовлень, попит на послуги та деталізація по запасах.
           </p>
         </div>
 

@@ -1,17 +1,5 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { Dashboard } from './pages/Dashboard';
-// import { MyVehicles } from './pages/MyVehicles';
-// import { MyOrders } from './pages/MyOrders';
-// import { BookingFlow } from './pages/BookingFlow';
-// import { ManagerOrders } from './pages/ManagerOrders';
-// import { ManagerParts } from './pages/ManagerParts';
-// import { ManagerServices } from './pages/ManagerServices';
-// import { ManagerBays } from './pages/ManagerBays';
-// import { MechanicWorkplace } from './pages/MechanicWorkplace';
-// import { Finance } from './pages/Finance';
-// import { Analytics } from './pages/Analytics';
-// import { Admin } from './pages/Admin';
-// import { Profile } from './pages/Profile';
 import { useAuth } from './context/AuthContext';
 import { Login } from './pages/Login';
 import { Root } from './pages/Root';
@@ -80,14 +68,7 @@ export const router = createBrowserRouter([
       { path: 'admin', element: <RoleRoute roles={['Admin']}><Admin /></RoleRoute> },
       { path: 'admin/data-import', element: <RoleRoute roles={['Admin']}><DataImport /></RoleRoute> },
       { path: 'profile', element: <Profile /> },
-    //   { path: 'manager/parts', element: <ManagerParts /> },
-    //   { path: 'manager/services', element: <ManagerServices /> },
-    //   { path: 'manager/bays', element: <ManagerBays /> },
-      { path: 'mechanic/workplace', element: <MechanicWorkplace /> },
-    //   { path: 'finance', element: <Finance /> },
-    //   { path: 'analytics', element: <Analytics /> },
-    //   { path: 'admin', element: <Admin /> },
-    //   { path: 'profile', element: <Profile /> },
+      { path: 'mechanic/workplace', element: <MechanicWorkplace /> }
     ],
   },
 ]);

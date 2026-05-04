@@ -1089,15 +1089,6 @@ export class OrderService {
       }
     });
 
-    await prisma.part.update({
-      where: { id: data.partId },
-      data: {
-        stockQuantity: {
-          decrement: data.quantity
-        }
-      }
-    });
-
     return this.getById(actor, orderId);
   }
 
@@ -1154,17 +1145,6 @@ export class OrderService {
         }
       });
 
-      if (difference !== 0) {
-        await tx.part.update({
-          where: { id: partId },
-          data: {
-            stockQuantity: {
-              [difference > 0 ? 'decrement' : 'increment']: Math.abs(difference)
-            }
-          }
-        });
-      }
-
       await this.recalculateOrderTotal(tx, orderId);
       return this.getById(actor, orderId);
     });
@@ -1193,15 +1173,6 @@ export class OrderService {
           orderId_partId: {
             orderId,
             partId
-          }
-        }
-      });
-
-      await tx.part.update({
-        where: { id: partId },
-        data: {
-          stockQuantity: {
-            increment: orderPart.quantity
           }
         }
       });

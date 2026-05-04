@@ -80,8 +80,6 @@ const COMMON_CLIENTS: SeedClient[] = Array.from({ length: TARGET_CLIENTS }, (_, 
   };
 });
 
-const MODEL_YEARS = [2018, 2019, 2020, 2021, 2022];
-
 function slugify(value: string) {
   return value
     .toLowerCase()
@@ -114,34 +112,6 @@ function decodeHtmlEntities(value: string) {
     .replace(/&#(\d+);/g, (_, code: string) => String.fromCharCode(Number(code)));
 }
 
-function pickString(row: Record<string, unknown>, keys: string[]) {
-  for (const key of keys) {
-    const value = row[key];
-    if (typeof value === 'string' && value.trim()) {
-      return value.trim();
-    }
-    if (typeof value === 'number' && Number.isFinite(value)) {
-      return String(value);
-    }
-  }
-
-  return '';
-}
-
-function pickNumber(row: Record<string, unknown>, keys: string[]) {
-  for (const key of keys) {
-    const value = row[key];
-    if (typeof value === 'number' && Number.isFinite(value)) {
-      return value;
-    }
-    if (typeof value === 'string' && value.trim() && Number.isFinite(Number(value))) {
-      return Number(value);
-    }
-  }
-
-  return undefined;
-}
-
 async function fetchJson<T>(url: string): Promise<T> {
   const response = await fetch(url, {
     headers: {
@@ -156,19 +126,6 @@ async function fetchJson<T>(url: string): Promise<T> {
   return (await response.json()) as T;
 }
 
-async function fetchHtml(url: string) {
-  const response = await fetch(url, {
-    headers: {
-      'user-agent': 'autoservice-data-import/1.0'
-    }
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch ${url}: ${response.status} ${response.statusText}`);
-  }
-
-  return response.text();
-}
 
 async function fetchText(url: string) {
   const response = await fetch(url, {
@@ -296,58 +253,6 @@ function stripHtmlToLines(html: string) {
     .split(/\r?\n/)
     .map((line) => line.replace(/\s+/g, ' ').trim())
     .filter(Boolean);
-}
-
-function parseServiceTemplatesFromHtml(html: string, source: string) {
-  const skipExact = new Set([
-    'Home',
-    'Auto Repair and Maintenance Services',
-    'How can we help?',
-    'GET A QUOTE',
-    'Read FAQ',
-    'Our certified mechanics perform over 500 services.',
-    'Search for service or your car problem...',
-    'Find Repair Location',
-    'Get your estimate and book with a RepairPal Certified location.'
-  ]);
-
-  const lines = stripHtmlToLines(html);
-  const templates: ServiceTemplate[] = [];
-  let currentSection = 'General';
-
-  for (const line of lines) {
-    const heading = line.match(/^(#{1,6})\s*(.+)$/);
-    if (heading) {
-      const section = cleanWikiText(heading[2]);
-      if (section && !skipExact.has(section)) {
-        currentSection = section;
-      }
-      continue;
-    }
-
-    const bullet = line.match(/^[*\-•]\s*(.+)$/);
-    if (!bullet) continue;
-
-    let name = cleanWikiText(decodeHtmlEntities(bullet[1]));
-    if (!name || name.length < 3) continue;
-    if (skipExact.has(name)) continue;
-    if (/^(Input:|Image:|URL:|Snippet:)/i.test(name)) continue;
-    if (/^[A-Z0-9\s/&(),.-]+$/.test(name) && name.length > 50) continue;
-    if (/^\d+\s*$/.test(name)) continue;
-    name = name.replace(/\s+\$[0-9].*$/, '').trim();
-    if (!name) continue;
-
-    templates.push({
-      name,
-      category: currentSection,
-      source
-    });
-  }
-
-  return uniqueBy(
-    templates,
-    (item) => `${item.source.toLowerCase()}::${item.category.toLowerCase()}::${item.name.toLowerCase()}`
-  );
 }
 
 function uniqueBy<T>(rows: T[], keyFn: (row: T) => string) {
@@ -755,8 +660,6 @@ async function importServiceCatalog() {
     throw new Error('No service templates were parsed from external sources');
   }
 
-  // Do not delete imported services because they may already be linked
-  // to non-import orders created by users, and the relation is RESTRICT.
   const existingImportedServices = await prisma.service.findMany({
     where: {
       description: {
