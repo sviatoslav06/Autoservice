@@ -8,7 +8,17 @@ A full-stack web application for managing an auto repair shop end-to-end: work o
 
 ## Screenshots
 
-> _Add 2–3 screenshots of the dashboard, order flow, and mechanic workplace here_
+<img width="5088" height="3378" alt="image" src="https://github.com/user-attachments/assets/4925d01d-5f95-4775-b67d-a23a7f6e5e8e" />
+<p><em>Dashboard — overview of created orders (different role - different view)</em></p>
+
+<img width="5088" height="3378" alt="image" src="https://github.com/user-attachments/assets/c1f525aa-717a-4f73-a899-f37e0b9a5b9c" />
+<p><em>Last page of order creation</em></p>
+
+<img width="5088" height="3378" alt="image" src="https://github.com/user-attachments/assets/b9130ca9-106c-4c25-ba46-1a703438fae9" />
+<p><em>Mechanics workplace - page where mechanic can manage orders</em></p>
+
+<img width="5088" height="3378" alt="image" src="https://github.com/user-attachments/assets/2b364f41-937c-456e-9fe0-c8136aa2b1e4" />
+<p><em>Admin panel - page where admin can manage everything</em></p>
 
 ---
 
